@@ -1,0 +1,268 @@
+<html>
+
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous">
+    </script>
+    <title>User tables</title>
+</head>
+
+<body>
+    <!-- navbar area, for filter input-->
+    <nav class="navbar sticky-top navbar-light bg-light">
+        <div class="container-fluid w-50">
+            <label for="search-user" class="col-sm-2 col-form-label">Search for employee:</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="search-user" placeholder="Enter a name">
+            </div>
+        </div>
+    </nav>
+    <!-- /end of navbar area-->
+    <!-- part for displaying user content-->
+    <div class="container pt-5">
+        <h2>Users</h2>
+        <table class="table mb-5 align-middle" id="users">
+            <thead>
+                <tr>
+                    <th style="width:20%;" scope="col">#</th>
+                    <th style="width:20%;" scope="col">First</th>
+                    <th style="width:20%;" scope="col">Last</th>
+                    <th style="width:20%;" scope="col">Role</th>
+                    <th style="width:20%;" scope="col"></th>
+                </tr>
+            </thead>
+            <tbody id="users_tbody">
+               
+            </tbody>
+        </table>
+        <h2>Senior Users</h2>
+        <table class="table mb-5 align-middle" id="senior-users">
+            <thead>
+                <tr>
+                    <th style="width:20%;" scope="col">#</th>
+                    <th style="width:20%;" scope="col">First</th>
+                    <th style="width:20%;" scope="col">Last</th>
+                    <th style="width:20%;" scope="col">Role</th>
+                    <th style="width:20%;" scope="col"></th>
+                </tr>
+            </thead>
+            <tbody id="SeniorUsers_tbody">
+                
+            </tbody>
+        </table>
+        <h2>WFM</h2>
+        <table class="table mb-5 align-middle" id="wfm-users">
+            <thead>
+                <tr>
+                    <th style="width:20%;" scope="col">#</th>
+                    <th style="width:20%;" scope="col">First</th>
+                    <th style="width:20%;" scope="col">Last</th>
+                    <th style="width:20%;" scope="col">Role</th>
+                    <th style="width:20%;" scope="col"></th>
+                </tr>
+            </thead>
+            <tbody id="wfm_tbody">
+                
+            </tbody>
+        </table>
+        <button onclick="addUser()" type="button" class="btn btn-primary" >
+            Add User
+        </button>
+    </div>
+    <!-- /end of displaying content-->
+    <!-- modal area-->
+    <div class="modal fade" id="add-user-modal" tabindex="-1" aria-labelledby="add-user-modal-label" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="add-user-modal-label">Add a new user</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="first-name-input">First Name</label>
+                        <input required type="text" class="form-control" id="first-name-input" placeholder="Mark">
+                    </div>
+                    <div class="mb-3">
+                        <label for="last-name-input">Last Name</label>
+                        <input required type="text" class="form-control" id="last-name-input" placeholder="Otto">
+                    </div>
+                    <div class="mb-3">
+                        <label for="role-select">Role</label>
+                        <select class="form-select" id="role-select" aria-label="Role select">
+                            <option selected>Select a role</option>
+                            <option value="1">User</option>
+                            <option value="2">Senior User</option>
+                            <option value="3">WFM</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                            <label id="ErrorMessage" class="text-red"></label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button onclick="SaveUser()" type="button" class="btn btn-primary">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /end of modal area.-->
+</body>
+
+</html>
+<script>
+            
+$(document).ready(function () {
+
+        $.getJSON("employees.json",function(data) {
+            
+            var UsersTable = "";
+                var SeniorUsers = "";
+                var WFMprofessionals = "";
+            var RowCount = 1 ;
+            $(data.users).each(function( index,value ) {
+                
+                if(value.role ==1){
+                    
+                    RowCount=parseInt($('#users_tbody tr:last td').text() == "" ? 1 :parseInt($('#users_tbody tr:last td').html()) + 1); 
+                    UsersTable+="<tr id="+value.id+">";
+                        UsersTable+='<td>'+ RowCount +'</td>';
+                        UsersTable+='<td>'+ value.firstName +'</td>';
+                        UsersTable+='<td>'+ value.lastName +'</td>';
+                        UsersTable+='<td>User</td>';
+                        UsersTable+= '<td><button type="button" onClick="DeleteUser(this)" class="DeleteUser btn btn-outline-danger btn-sm">Delete</button></td>'
+                        UsersTable+="</tr>"; 
+                        $('#users_tbody').html(UsersTable);
+                }
+
+                else if(value.role == 2){
+                    RowCount=parseInt($('#SeniorUsers_tbody tr:last td').text() == "" ? 1 :parseInt($('#SeniorUsers_tbody tr:last td').html()) +1); 
+                    SeniorUsers+="<tr id="+value.id+">";
+                        SeniorUsers+='<td>'+ RowCount  +'</td>';
+                        SeniorUsers+='<td>'+ value.firstName +'</td>';
+                        SeniorUsers+='<td>'+ value.lastName +'</td>';
+                        SeniorUsers+='<td>Senior User</td>';
+                        SeniorUsers+='<td><button type="button" onClick="DeleteUser(this)" class="DeleteUser btn btn-outline-danger btn-sm">Delete</button></td>'
+                        SeniorUsers+="</tr>"; 
+                        $('#SeniorUsers_tbody').html(SeniorUsers);
+                }
+                else {
+                    RowCount=parseInt($('#wfm_tbody tr:last td').text() == "" ? 1 :parseInt($('#wfm_tbody tr:last td').html()) +1); 
+                    WFMprofessionals+="<tr id="+value.id+">";
+                        WFMprofessionals+='<td>'+ RowCount  +'</td>';
+                        WFMprofessionals+='<td>'+ value.firstName +'</td>';
+                        WFMprofessionals+='<td>'+ value.lastName +'</td>';
+                        WFMprofessionals+='<td>WFM Professional</td>';
+                        WFMprofessionals+='<td><button type="button" onClick="DeleteUser(this)" class="DeleteUser btn btn-outline-danger btn-sm">Delete</button></td>'
+                        WFMprofessionals+="</tr>"; 
+                        $('#wfm_tbody').html(WFMprofessionals);
+                }
+                
+            
+            
+            });
+            
+           
+
+
+        });
+        
+   // Search Employee Function
+    $("#search-user").on("keyup", function() {
+    var value = $(this).val().toLowerCase();
+    $(".table tbody tr").filter(function() {
+      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+    });
+  });
+        
+    })
+
+    function SaveUser(){
+        var ErrorMessage = "" ; 
+        //$("#ErrorMessage").html("");
+        var FirstName = $("#first-name-input").val();
+        var LastName = $("#last-name-input").val();
+        var role = parseInt($("#role-select").val());
+        if(FirstName == ""){ 
+            ErrorMessage+="Please enter First Name";
+
+        }
+        if(LastName == ""){
+            ErrorMessage+="<br /> Please enter Last Name";
+        }
+
+        if(!role){
+            ErrorMessage+="<br /> Please select Role for user";
+        }
+
+        $("#ErrorMessage").html(ErrorMessage);
+
+        if(ErrorMessage!=""){
+            return false;
+        }
+        else{
+            var Users = "";
+            var SeniorUser ="" ;
+            var WFM = "" ;
+            if(role ==1){
+                var index = parseInt($('#users_tbody tr:last').find("td:first").html())  + 1 ;
+                    if(!index){
+                        index =1 ; 
+                    }
+                    Users+="<tr >";
+                        Users+='<td>'+index+'</td>';
+                        Users+='<td>'+ FirstName +'</td>';
+                        Users+='<td>'+ LastName +'</td>';
+                        Users+='<td>User</td>';
+                        Users+= '<td><button type="button" onClick="DeleteUser(this)" class="DeleteUser btn btn-outline-danger btn-sm">Delete</button></td>'
+                        Users+="</tr>"; 
+                        $('#users_tbody').append(Users);
+                }
+
+                else if(role == 2){
+                    var index = parseInt($('#users_tbody tr:last').find("td:first").html()) + 1 ;
+                    SeniorUser+="<tr >";
+                        SeniorUser+='<td>'+index+'</td>';
+                        SeniorUser+='<td>'+ FirstName +'</td>';
+                        SeniorUser+='<td>'+ LastName +'</td>';
+                        SeniorUser+='<td>Senior User</td>';
+                        SeniorUser+='<td><button type="button" onClick="DeleteUser(this)" class="DeleteUser btn btn-outline-danger btn-sm">Delete</button></td>'
+                        SeniorUser+="</tr>"; 
+                        $('#SeniorUsers_tbody').append(SeniorUser);
+                }
+                else {
+                    var index = parseInt($('#users_tbody tr:last').find("td:first").html()) + 1 ;
+                    WFM+="<tr>";
+                        WFM+='<td>'+index+'</td>';
+                        WFM+='<td>'+ FirstName +'</td>';
+                        WFM+='<td>'+ LastName +'</td>';
+                        WFM+='<td>WFM Professional</td>';
+                        WFM+='<td><button type="button" onClick="DeleteUser(this)" class="DeleteUser btn btn-outline-danger btn-sm">Delete</button></td>'
+                        WFM+="</tr>"; 
+                        $('#wfm_tbody').append(WFM);
+                }
+                $("#add-user-modal").modal('toggle'); //close the modal Once user saves successfully
+             }
+        
+    }
+
+   //Delete User
+   function DeleteUser(UserRow) {
+        $(UserRow).closest("tr").remove();
+
+    }
+
+    function addUser(){
+    //Reset Values of PopUp
+    $("#ErrorMessage").html("");
+    $("#first-name-input").text("");
+    $("#last-name-input").text("");
+    
+    $("#add-user-modal").modal('toggle');
+    
+   }
+</script>
